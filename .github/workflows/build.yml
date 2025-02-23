@@ -53,7 +53,6 @@ jobs:
           [  -z "$AMD64_DEB" ] && exit 2
           wget -nv ${KERNEL_URL}v${{matrix.kernel_version}}/$AMD64_DEB
           wget -nv ${KERNEL_URL}v${{matrix.kernel_version}}/$ALL_DEB
-          wget -nv http://mirrors.kernel.org/ubuntu/pool/main/g/glibc/libc6_2.38-1ubuntu6_amd64.deb
           echo "KVER=$(echo $ALL_DEB | cut -d '_' -f 2 | rev | cut -c14- | rev)-generic" >> $GITHUB_ENV
       - name: Set up GCC
         if: steps.check_version.outputs.skip_build == 'False'
