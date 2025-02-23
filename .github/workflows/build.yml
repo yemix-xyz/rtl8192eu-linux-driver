@@ -23,7 +23,7 @@ jobs:
           echo ::set-output name=matrix::${VERSIONSARRAY}
   build:
     needs: commontasks
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -45,8 +45,8 @@ jobs:
         run: sudo dpkg --force-all -i *.deb
       - name: update GCC
         run: |
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
       - uses: actions/checkout@v2
       - name: build kernel ${{ matrix.kernel_version }}
         run: make KVER=$KVER CC=cc
