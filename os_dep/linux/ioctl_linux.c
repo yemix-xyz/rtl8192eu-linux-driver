@@ -25,6 +25,7 @@
 #endif
 
 #ifdef __KERNEL__
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(7, 0, 0))
 extern int mac_pton(const char *s, u8 *addr);
 #endif
 
