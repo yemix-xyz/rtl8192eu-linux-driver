@@ -28,6 +28,7 @@
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(7, 0, 0))
 extern int mac_pton(const char *s, u8 *addr);
 #endif
+#endif
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 27))
 #define  iwe_stream_add_event(a, b, c, d, e)  iwe_stream_add_event(b, c, d, e)
