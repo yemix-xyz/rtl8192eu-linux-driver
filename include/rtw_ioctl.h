@@ -115,4 +115,8 @@ extern int rtw_vendor_ie_get(struct net_device *, struct iw_request_info *, unio
 extern int rtw_vendor_ie_set(struct net_device*, struct iw_request_info*, union iwreq_data*, char*);
 #endif
 
+void rtw_indicate_wx_assoc_event(_adapter *padapter);
+void rtw_indicate_wx_disassoc_event(_adapter *padapter);
+void indicate_wx_scan_complete_event(_adapter *padapter);
+
 #endif /*  #ifndef __INC_CEINFO_ */
