@@ -793,7 +793,7 @@ out_free_buffer:
 		rtw_mfree((u8 *)eFuseWord, EFUSE_MAX_SECTION_NUM * (EFUSE_MAX_WORD_UNIT * 2));
 }
 
-VOID efuse_PreUpdateAction(
+static VOID efuse_PreUpdateAction(
 	PADAPTER	pAdapter,
 	pu4Byte	BackupRegs)
 {
@@ -822,7 +822,7 @@ VOID efuse_PreUpdateAction(
 }
 
 
-VOID efuse_PostUpdateAction(
+static VOID efuse_PostUpdateAction(
 	PADAPTER	pAdapter,
 	pu4Byte	BackupRegs)
 {
@@ -2214,7 +2214,7 @@ Efuse_PgPacketWrite(IN	PADAPTER	pAdapter,
 }
 
 
-int
+static int
 Efuse_PgPacketWrite_BT(IN	PADAPTER	pAdapter,
 		       IN	u8			offset,
 		       IN	u8			word_en,
