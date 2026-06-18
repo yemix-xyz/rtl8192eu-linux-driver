@@ -66,6 +66,7 @@ enum phystat_rpt {
 #ifndef PHYDM_COMMON_API_SUPPORT
 #define INVALID_RF_DATA 0xffffffff
 #define INVALID_TXAGC_DATA 0xff
+u8 config_phydm_read_txagc_n(void *dm_void, enum rf_path path, u8 hw_rate);
 #endif
 
 /* @1 ============================================================
