@@ -34,8 +34,11 @@
 #define STATION_INFO_PLINK_STATE	BIT(NL80211_STA_INFO_PLINK_STATE)
 #define STATION_INFO_SIGNAL			BIT(NL80211_STA_INFO_SIGNAL)
 #define STATION_INFO_TX_BITRATE		BIT(NL80211_STA_INFO_TX_BITRATE)
+#define STATION_INFO_RX_BITRATE		BIT(NL80211_STA_INFO_RX_BITRATE)
 #define STATION_INFO_RX_PACKETS		BIT(NL80211_STA_INFO_RX_PACKETS)
+#define STATION_INFO_RX_BYTES		BIT(NL80211_STA_INFO_RX_BYTES)
 #define STATION_INFO_TX_PACKETS		BIT(NL80211_STA_INFO_TX_PACKETS)
+#define STATION_INFO_TX_BYTES		BIT(NL80211_STA_INFO_TX_BYTES)
 #define STATION_INFO_TX_FAILED		BIT(NL80211_STA_INFO_TX_FAILED)
 #define STATION_INFO_LOCAL_PM		BIT(NL80211_STA_INFO_LOCAL_PM)
 #define STATION_INFO_PEER_PM		BIT(NL80211_STA_INFO_PEER_PM)
@@ -2299,12 +2302,12 @@ static int cfg80211_rtw_get_station(struct wiphy *wiphy,
 			ret = -ENOENT;
 			goto exit;
 		}
-
 		sinfo->filled |= STATION_INFO_SIGNAL;
 		sinfo->signal = translate_percentage_to_dbm(padapter->recvpriv.signal_strength);
-
 		sinfo->filled |= STATION_INFO_TX_BITRATE;
 		sinfo->txrate.legacy = rtw_get_cur_max_rate(padapter);
+		sinfo->filled |= STATION_INFO_RX_BITRATE;
+		sinfo->rxrate.legacy = rtw_get_cur_max_rate(padapter);
 	}
 
 	if (psta) {
@@ -2318,8 +2321,12 @@ static int cfg80211_rtw_get_station(struct wiphy *wiphy,
 		sinfo->inactive_time = rtw_get_passing_time_ms(psta->sta_stats.last_rx_time);
 		sinfo->filled |= STATION_INFO_RX_PACKETS;
 		sinfo->rx_packets = sta_rx_data_pkts(psta);
+		sinfo->filled |= STATION_INFO_RX_BYTES;
+		sinfo->rx_bytes = psta->sta_stats.rx_bytes;
 		sinfo->filled |= STATION_INFO_TX_PACKETS;
 		sinfo->tx_packets = psta->sta_stats.tx_pkts;
+		sinfo->filled |= STATION_INFO_TX_BYTES;
+		sinfo->tx_bytes = psta->sta_stats.tx_bytes;
 		sinfo->filled |= STATION_INFO_TX_FAILED;
 		sinfo->tx_failed = psta->sta_stats.tx_fail_cnt;
 	}
@@ -5797,15 +5804,51 @@ static int	cfg80211_rtw_dump_station(struct wiphy *wiphy, struct net_device *nde
 	int ret = 0;
 	_irqL irqL;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	struct sta_priv *pstapriv = &padapter->stapriv;
 	struct sta_info *psta = NULL;
 #ifdef CONFIG_RTW_MESH
 	struct mesh_plink_ent *plink = NULL;
 #endif
 	u8 asoc_list_num;
+	sinfo->filled = 0;
 
 	if (DBG_DUMP_STATION)
 		RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+
+	/* for infra./P2PClient mode */
+	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) &&
+		check_fwstate(pmlmepriv, _FW_LINKED)) {
+		/* Single station in STA/P2PClient mode */
+		if (idx > 0)
+			return -ENOENT;
+
+		struct wlan_network *cur_network = &pmlmepriv->cur_network;
+		psta = rtw_get_stainfo(pstapriv, cur_network->network.MacAddress);
+		if (!psta)
+			return -ENOENT;
+
+		memcpy(mac, psta->cmn.mac_addr, ETH_ALEN);
+		sinfo->filled |= STATION_INFO_SIGNAL;
+		sinfo->signal = translate_percentage_to_dbm(padapter->recvpriv.signal_strength);
+		sinfo->filled |= STATION_INFO_INACTIVE_TIME;
+		sinfo->inactive_time = rtw_get_passing_time_ms(psta->sta_stats.last_rx_time);
+		sinfo->filled |= STATION_INFO_TX_BITRATE;
+		sinfo->txrate.legacy = rtw_get_cur_max_rate(padapter);
+		sinfo->filled |= STATION_INFO_RX_BITRATE;
+		sinfo->rxrate.legacy = rtw_get_cur_max_rate(padapter);
+		sinfo->filled |= STATION_INFO_RX_PACKETS;
+		sinfo->rx_packets = sta_rx_data_pkts(psta);
+		sinfo->filled |= STATION_INFO_RX_BYTES;
+		sinfo->rx_bytes = psta->sta_stats.rx_bytes;
+		sinfo->filled |= STATION_INFO_TX_PACKETS;
+		sinfo->tx_packets = psta->sta_stats.tx_pkts;
+		sinfo->filled |= STATION_INFO_TX_BYTES;
+		sinfo->tx_bytes = psta->sta_stats.tx_bytes;
+		sinfo->filled |= STATION_INFO_TX_FAILED;
+		sinfo->tx_failed = psta->sta_stats.tx_fail_cnt;
+		goto exit;
+	}
 
 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
 	psta = rtw_sta_info_get_by_idx(pstapriv, idx, &asoc_list_num);
@@ -5837,8 +5880,6 @@ static int	cfg80211_rtw_dump_station(struct wiphy *wiphy, struct net_device *nde
 	else
 		memcpy(mac, plink->addr, ETH_ALEN);
 	#endif
-	
-	sinfo->filled = 0;
 
 	if (psta) {
 		sinfo->filled |= STATION_INFO_SIGNAL;
