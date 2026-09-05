@@ -1546,6 +1546,7 @@ RETURN:
 	return;
 }
 
+int rtw_change_ifname(_adapter *padapter, const char *ifname);
 int rtw_change_ifname(_adapter *padapter, const char *ifname)
 {
 	struct dvobj_priv *dvobj;

@@ -749,7 +749,7 @@ PHY_SetTxPowerLevel8192E(
 	/* RTW_INFO("<==PHY_SetTxPowerLevel8192E()\n"); */
 }
 
-u8
+static u8
 phy_GetSecondaryChnl_8192E(
 	IN	PADAPTER	Adapter
 )
@@ -793,7 +793,7 @@ phy_GetSecondaryChnl_8192E(
 	return (SCSettingOf40 << 4) | SCSettingOf20;
 }
 
-VOID
+static VOID
 phy_SetRegBW_8192E(
 	IN	PADAPTER		Adapter,
 	enum channel_width	CurrentBW
@@ -825,7 +825,7 @@ phy_SetRegBW_8192E(
 }
 
 
-VOID
+static VOID
 phy_PostSetBwMode8192E(
 	IN	PADAPTER	Adapter
 )
@@ -1029,7 +1029,7 @@ phy_SpurCalibration_8192E_NBI(PADAPTER Adapter)
 	}
 }
 #endif
-VOID
+static VOID
 phy_SwChnl8192E(
 	IN	PADAPTER	pAdapter
 )
@@ -1046,7 +1046,7 @@ phy_SwChnl8192E(
 
 }
 
-VOID
+static VOID
 phy_SwChnlAndSetBwMode8192E(
 	IN  PADAPTER		Adapter
 )
@@ -1105,7 +1105,7 @@ phy_SwChnlAndSetBwMode8192E(
 		PHY_SetTxPowerLevel8192E(Adapter, pHalData->current_channel);
 }
 
-VOID
+static VOID
 PHY_HandleSwChnlAndSetBW8192E(
 	IN	PADAPTER			Adapter,
 	IN	BOOLEAN				bSwitchChannel,

@@ -327,4 +327,8 @@ void rtl8192e_stop_thread(_adapter *padapter);
 	void rtl8192e_combo_card_WifiOnlyHwInit(PADAPTER Adapter);
 #endif
 
+#ifdef CONFIG_USB_HCI
+void UpdateInterruptMask8192EU(PADAPTER padapter, u8 bHIMR0, u32 AddMSR, u32 RemoveMSR);
+#endif
+
 #endif /* __RTL8192E_HAL_H__ */
